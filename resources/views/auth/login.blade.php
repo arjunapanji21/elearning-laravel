@@ -1,22 +1,29 @@
 @extends('layouts.secondary') @section('content')
 <div class="hero min-h-screen bg-base-200">
     <div class="hero-content flex-col">
-        <div class="text-center">
-            <h1 class="text-5xl font-bold my-10">Login</h1>
+        <div class="flex flex-col justify-center text-center">
+            <img
+                src="{{ asset('img/logo.png') }}"
+                alt="logo.png"
+                width="90"
+                class="mx-auto"
+            />
+            <h1 class="text-2xl font-bold">E-Learning</h1>
+            <h3 class="text-xl">SMK Negeri 4 Kota Jambi</h3>
         </div>
         <div class="card w-full shadow-2xl bg-base-100">
             <div class="card-body">
                 <form action="{{ route('user.auth') }}" method="post">
                     @csrf
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="block">
                         <div class="form-control">
                             <label class="label">
-                                <span class="label-text">Email</span>
+                                <span class="label-text">Username</span>
                             </label>
                             <input
-                                name="email"
-                                type="email"
-                                placeholder="email"
+                                name="username"
+                                type="text"
+                                placeholder="username"
                                 class="input input-bordered"
                             />
                         </div>
@@ -34,27 +41,18 @@
                     </div>
                     <div class="form-control my-4">
                         <button type="submit" class="btn btn-primary">
-                            Sign In
+                            Masuk
                         </button>
                     </div>
                 </form>
-                <div class="flex">
-                    <label class="label mx-auto">
-                        <a
-                            href="{{ route('user.forgot') }}"
-                            class="label-text-alt link link-hover"
-                            >Forgot Password?</a
-                        >
-                    </label>
-                    <div class="divider divider-horizontal"></div>
-                    <label class="label mx-auto">
-                        <a
-                            href="{{ route('user.register') }}"
-                            class="label-text-alt link link-hover"
-                            >Create Account</a
-                        >
-                    </label>
-                </div>
+
+                <label class="label mx-auto">
+                    <a
+                        href="{{ route('user.forgot') }}"
+                        class="label-text-alt link link-hover"
+                        >Lupa password?</a
+                    >
+                </label>
             </div>
         </div>
     </div>

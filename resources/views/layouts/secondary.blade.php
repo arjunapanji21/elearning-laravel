@@ -7,8 +7,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link href="{{ asset('css/app.css') }}" rel="stylesheet" />
         <link href="{{ asset('css/fa/all.min.css') }}" rel="stylesheet" />
+        <link
+            rel="icon"
+            type="image/x-icon"
+            href="{{ asset('img/logo.png') }}"
+        />
 
-        <title>Laradaisy | {{ $title }}</title>
+        <title>E-learning SMK Negeri 4 | {{ $title }}</title>
     </head>
     <body>
         @yield('content')
