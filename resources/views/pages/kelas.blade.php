@@ -18,21 +18,28 @@
                     Join Kelas
                 </button>
                 <dialog id="modal_join_kelas" class="modal">
-                    <form method="dialog" class="modal-box">
-                        <h3 class="font-bold text-lg">Input Kode Kelas</h3>
+                    <form
+                        action="{{ route('kelas.join') }}"
+                        method="post"
+                        class="modal-box"
+                    >
+                        @csrf
+                        <h3 class="font-bold text-lg mb-2">Input Kode Kelas</h3>
                         <input
+                            name="kode"
                             type="text"
                             placeholder="Kode Kelas"
-                            class="input input-bordered w-full my-4"
+                            class="input input-bordered w-full"
                         />
                         <div class="modal-action">
                             <!-- if there is a button in form, it will close the modal -->
                             <button
-                                class="btn btn-sm btn-primary text-base-100"
+                                type="submit"
+                                class="btn btn-primary text-base-100"
                             >
                                 Join
                             </button>
-                            <button class="btn btn-sm">Batal</button>
+                            <label class="btn">Batal</label>
                         </div>
                     </form>
                 </dialog>
@@ -58,26 +65,32 @@
             <tr>
                 <th>#</th>
                 <th>Nama Kelas</th>
-                <th>Jumlah Siswa</th>
                 <th>Kode Kelas</th>
+                @if(auth()->user()->profile->role != 'Siswa')
+                <th>Jumlah Siswa</th>
                 <th>Tgl. Dibuat</th>
+                @elseif(auth()->user()->profile->role == 'Siswa')
+                <th>Nama Guru</th>
+                <th>Tgl. Bergabung</th>
+                @endif
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach($kelas as $row)
+            @foreach($kelas as $row) @if(auth()->user()->profile->role !=
+            'Siswa')
             <tr>
                 <th>
                     {{$loop->iteration}}
                 </th>
                 <td>{{$row->nama}}</td>
-                <td>0</td>
                 <td>
                     <span
                         class="badge font-bold normal-case"
                         >{{$row->kode}}</span
                     >
                 </td>
+                <td>{{count($row->siswa)}}</td>
                 <td>{{date('d/m/Y', strtotime($row->created_at))}}</td>
                 <td>
                     <a
@@ -87,7 +100,29 @@
                     >
                 </td>
             </tr>
-            @endforeach
+            @elseif(auth()->user()->profile->role == 'Siswa')
+            <tr>
+                <th>
+                    {{$loop->iteration}}
+                </th>
+                <td>{{$row->kelas->nama}}</td>
+                <td>
+                    <span
+                        class="badge font-bold normal-case"
+                        >{{$row->kelas->kode}}</span
+                    >
+                </td>
+                <td>{{$row->kelas->guru->user->name}}</td>
+                <td>{{date('d/m/Y', strtotime($row->created_at))}}</td>
+                <td>
+                    <a
+                        href="{{ route('kelas.edit', $row->id) }}"
+                        class="btn btn-ghost btn-xs"
+                        >Lihat</a
+                    >
+                </td>
+            </tr>
+            @endif @endforeach
         </tbody>
     </table>
 </div>

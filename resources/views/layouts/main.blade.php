@@ -77,7 +77,7 @@
                                 tabindex="0"
                                 class="btn btn-sm m-1 btn-ghost normal-case"
                             >
-                                {{auth()->user()->name}}!
+                                {{auth()->user()->name}}
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="16"

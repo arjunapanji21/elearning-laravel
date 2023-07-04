@@ -3,13 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kelas;
+use App\Models\KelasSiswa;
 use Illuminate\Http\Request;
 
 class KelasController extends Controller
 {
     public function join(Request $request)
     {
-        dd($request);
+        $kelas_id = Kelas::where('kode', $request['kode'])->get()->first()->id;
+        $cek_duplikasi = KelasSiswa::where('kelas_id', $kelas_id)->where('profile_id', auth()->user()->profile->id)->get();
+        if (count($cek_duplikasi) > 0) {
+            return back()->with('error', 'Join Kelas Gagal! Anda sudah berada di kelas ini.');
+        } else {
+            KelasSiswa::create([
+                'kelas_id' => $kelas_id,
+                'profile_id' => auth()->user()->profile->id,
+            ]);
+            return back()->with('success', 'Berhasil Join Kelas');
+        }
     }
     /**
      * Display a listing of the resource.
@@ -18,11 +29,19 @@ class KelasController extends Controller
      */
     public function index()
     {
-        $kelas = Kelas::where('profile_id', auth()->user()->profile->id)->get();
-        return view('pages.kelas', [
-            'title' => 'Kelas',
-            'kelas' => $kelas,
-        ]);
+        if (auth()->user()->profile->role != 'Siswa') {
+            $kelas = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+            return view('pages.kelas', [
+                'title' => 'Kelas',
+                'kelas' => $kelas,
+            ]);
+        } else if (auth()->user()->profile->role == 'Siswa') {
+            $kelas = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+            return view('pages.kelas', [
+                'title' => 'Kelas',
+                'kelas' => $kelas,
+            ]);
+        }
     }
 
     /**
