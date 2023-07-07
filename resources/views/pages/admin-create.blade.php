@@ -57,7 +57,7 @@
                 <input
                     name="password_confirmation"
                     type="password"
-                    placeholder="Type here"
+                    placeholder="Ulangi Password"
                     class="input input-bordered w-full"
                 />
             </div>

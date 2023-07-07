@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class KelasController extends Controller
 {
+    public function kelas_detail($id, $kode)
+    {
+        return view('pages.kelas-detail', [
+            'title' => 'Kelas',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+        ]);
+    }
     public function join(Request $request)
     {
         $kelas_id = Kelas::where('kode', $request['kode'])->get()->first()->id;
@@ -29,7 +36,13 @@ class KelasController extends Controller
      */
     public function index()
     {
-        if (auth()->user()->profile->role != 'Siswa') {
+        if (auth()->user()->profile->role == 'Super Admin' || auth()->user()->profile->role == 'Admin') {
+            $kelas = Kelas::all();
+            return view('pages.kelas', [
+                'title' => 'Kelas',
+                'kelas' => $kelas,
+            ]);
+        } else if (auth()->user()->profile->role == 'Guru') {
             $kelas = Kelas::where('profile_id', auth()->user()->profile->id)->get();
             return view('pages.kelas', [
                 'title' => 'Kelas',
@@ -115,7 +128,7 @@ class KelasController extends Controller
      */
     public function update(Request $request, Kelas $kelas)
     {
-        //
+        dd($kelas);
     }
 
     /**

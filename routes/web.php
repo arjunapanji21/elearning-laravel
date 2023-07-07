@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/siswa', SiswaController::class);
     Route::resource('/kelas', KelasController::class);
     Route::post('/kelas/join', [KelasController::class, 'join'])->name('kelas.join');
+    Route::get('/kelas/{id}/{kode}', [KelasController::class, 'kelas_detail'])->name('kelas.detail');
     Route::get('/materi', [PageController::class, 'materi'])->name('materi');
     Route::get('/tugas', [PageController::class, 'tugas'])->name('tugas');
     Route::get('/kuis', [PageController::class, 'kuis'])->name('kuis');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,10 +11,8 @@ class PageController extends Controller
 {
     public function dashboard()
     {
-        $user = User::with('profile')->find(auth()->user()->id);
         return view('pages.dashboard', [
-            'title' => 'Dashboard | ' . $user->profile->role,
-            'user' => $user,
+            'title' => 'Dashboard | ' . auth()->user()->profile->role,
         ]);
     }
     public function materi()

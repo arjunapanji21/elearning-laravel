@@ -1,6 +1,12 @@
 @extends('layouts.main') @section('content')
+@if ($errors->has('error'))
+    <script>
+        alert("{{ $errors->first('error') }}");
+    </script>
+    @endif
 <div class="card card-compact w-full">
     <form action="{{ route('guru.update', $guru->id) }}" method="post">
+        @method('put')
         @csrf
         <div class="card-body">
             <div class="card-title">
@@ -35,6 +41,7 @@
                     <span class="label-text">Username</span>
                 </label>
                 <input
+                disabled
                     name="username"
                     type="text"
                     placeholder="Username"
@@ -60,7 +67,7 @@
                 <input
                     name="password_confirmation"
                     type="password"
-                    placeholder="Type here"
+                    placeholder="Ulangi Password"
                     class="input input-bordered w-full"
                 />
             </div>

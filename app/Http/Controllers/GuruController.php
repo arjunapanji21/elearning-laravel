@@ -94,9 +94,25 @@ class GuruController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $userId)
     {
-        //
+        try {
+            $data = $request->validate([
+                'name' => 'required',
+                'email' => 'required',
+            ]);
+            $user = User::find($userId);
+            $data = $request->all();
+            if ($data['password'] == $data['password_confirmation'] && $data['password'] != null) {
+                $data['password'] = bcrypt($data['password']);
+            } else {
+                $data['password'] = $user->password;
+            }
+            $user->update($data);
+            return redirect(route('guru.index'))->with('success', 'Data Guru Berhasil di Update!');
+        } catch (\Throwable $th) {
+            return back()->withErrors(['error' => 'Gagal melakukan perubahan data! Periksa nama dan email.']);
+        }
     }
 
     /**

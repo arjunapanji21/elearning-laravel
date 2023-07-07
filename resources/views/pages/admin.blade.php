@@ -1,4 +1,8 @@
-@extends('layouts.main') @section('content')
+@extends('layouts.main') @section('content') @if(session('success'))
+<script>
+    alert("{{ session('success') }}");
+</script>
+@endif
 <div class="card card-compact w-full">
     <div class="card-body">
         <div class="card-title justify-between items-center">

@@ -1,4 +1,8 @@
-@extends('layouts.main') @section('content')
+@extends('layouts.main') @section('content') @if(session('success'))
+<script>
+    alert("{{ session('success') }}");
+</script>
+@endif
 <div class="card card-compact w-full">
     <div class="card-body">
         <div class="card-title justify-between items-center">
@@ -68,6 +72,10 @@
                 <th>Kode Kelas</th>
                 @if(auth()->user()->profile->role != 'Siswa')
                 <th>Jumlah Siswa</th>
+                @if(auth()->user()->profile->role == 'Super Admin' ||
+                auth()->user()->profile->role == 'Admin')
+                <th>Nama Guru</th>
+                @endif
                 <th>Tgl. Dibuat</th>
                 @elseif(auth()->user()->profile->role == 'Siswa')
                 <th>Nama Guru</th>
@@ -91,10 +99,14 @@
                     >
                 </td>
                 <td>{{count($row->siswa)}}</td>
+                @if(auth()->user()->profile->role == 'Super Admin' ||
+                auth()->user()->profile->role == 'Admin')
+                <td class="font-bold">{{$row->guru->user->name}}</td>
+                @endif
                 <td>{{date('d/m/Y', strtotime($row->created_at))}}</td>
                 <td>
                     <a
-                        href="{{ route('kelas.edit', $row->id) }}"
+                        href="{{ route('kelas.detail', [$row->id, $row->kode]) }}"
                         class="btn btn-ghost btn-xs"
                         >Lihat</a
                     >
