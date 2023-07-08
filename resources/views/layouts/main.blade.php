@@ -323,9 +323,18 @@
                                 <li>
                                     <h2 class="menu-title">Kelas Anda</h2>
                                     <ul class="font-bold opacity-70">
-                                        <li><a>Kelas A</a></li>
-                                        <li><a>Kelas B</a></li>
-                                        <li><a>Kelas C</a></li>
+                                        @if(auth()->user()->profile->role ==
+                                        "Siswa") @foreach($kelas_list as $row)
+                                        <li>
+                                            <a>{{$row->kelas->nama}}</a>
+                                        </li>
+                                        @endforeach
+                                        @elseif(auth()->user()->profile->role !=
+                                        "Siswa") @foreach($kelas_list as $row)
+                                        <li>
+                                            <a>{{$row->nama}}</a>
+                                        </li>
+                                        @endforeach @endif
                                     </ul>
                                 </li>
                             </ul>

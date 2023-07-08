@@ -128,7 +128,7 @@
                 <td>{{date('d/m/Y', strtotime($row->created_at))}}</td>
                 <td>
                     <a
-                        href="{{ route('kelas.edit', $row->id) }}"
+                        href="{{ route('kelas.detail', [$row->kelas->id, $row->kelas->kode]) }}"
                         class="btn btn-ghost btn-xs"
                         >Lihat</a
                     >

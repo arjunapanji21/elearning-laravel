@@ -10,9 +10,17 @@ class KelasController extends Controller
 {
     public function kelas_detail($id, $kode)
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         return view('pages.kelas-detail', [
             'title' => 'Kelas',
             'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list
         ]);
     }
     public function join(Request $request)
@@ -37,21 +45,27 @@ class KelasController extends Controller
     public function index()
     {
         if (auth()->user()->profile->role == 'Super Admin' || auth()->user()->profile->role == 'Admin') {
+            $kelas_list = Kelas::all();
             $kelas = Kelas::all();
             return view('pages.kelas', [
                 'title' => 'Kelas',
                 'kelas' => $kelas,
+                'kelas_list' => $kelas_list
             ]);
         } else if (auth()->user()->profile->role == 'Guru') {
             $kelas = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
             return view('pages.kelas', [
                 'title' => 'Kelas',
                 'kelas' => $kelas,
+                'kelas_list' => $kelas_list,
             ]);
         } else if (auth()->user()->profile->role == 'Siswa') {
             $kelas = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
             return view('pages.kelas', [
                 'title' => 'Kelas',
+                'kelas_list' => $kelas_list,
                 'kelas' => $kelas,
             ]);
         }
@@ -64,8 +78,16 @@ class KelasController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         return view('pages.kelas-create', [
             'title' => 'Buat Kelas Baru',
+            'kelas_list' => $kelas_list
         ]);
     }
 

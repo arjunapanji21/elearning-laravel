@@ -3,9 +3,10 @@
 @for($i=0;$i<5;$i++)
 <div class="flex gap-4">
     <div class="divider divider-horizontal">
-        <span class="text-xs">{{ date("d/m/y") }}</span>
+        <span class="font-bold -my-1 text-xs">{{ date("d/m/y") }}</span>
+        <span class="-my-1 text-xs">{{ date("H:i") }}</span>
     </div>
-    <div class="card border card-compact w-full">
+    <div class="card border card-compact w-full my-2 hover:shadow">
         <div class="card-body">
             <div class="flex gap-2 items-center justify-start">
                 <div class="avatar placeholder">

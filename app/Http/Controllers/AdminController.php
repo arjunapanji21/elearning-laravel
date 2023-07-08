@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
+use App\Models\KelasSiswa;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,11 +17,19 @@ class AdminController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         $user = User::with('profile');
         return view('pages.admin', [
             'title' => 'Admin',
             'user' => $user->find(auth()->user()->id),
             'admins' => Profile::where('role', 'Admin')->get(),
+            'kelas_list' => $kelas_list
         ]);
     }
 
@@ -30,11 +40,19 @@ class AdminController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         $user = User::with('profile');
         return view('pages.admin-create', [
             'title' => 'Buat Admin Baru',
             'user' => $user->find(auth()->user()->id),
             'admins' => Profile::where('role', 'Admin')->get(),
+            'kelas_list' => $kelas_list
         ]);
     }
 
@@ -85,10 +103,18 @@ class AdminController extends Controller
      */
     public function edit($id, User $user)
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         $user = User::with('profile')->find($id);
         return view('pages.admin-update', [
             'title' => 'Profil Admin',
             'admin' => $user,
+            'kelas_list' => $kelas_list
         ]);
     }
 

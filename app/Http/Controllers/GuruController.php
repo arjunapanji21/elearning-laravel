@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kelas;
+use App\Models\KelasSiswa;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,9 +17,17 @@ class GuruController extends Controller
      */
     public function index()
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         return view('pages.guru', [
             'title' => 'Guru',
             'gurus' => Profile::where('role', 'Guru')->get(),
+            'kelas_list' => $kelas_list
         ]);
     }
 
@@ -28,8 +38,16 @@ class GuruController extends Controller
      */
     public function create()
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         return view('pages.guru-create', [
             'title' => 'Buat Guru Baru',
+            'kelas_list' => $kelas_list
         ]);
     }
 
@@ -80,10 +98,18 @@ class GuruController extends Controller
      */
     public function edit($id, User $user)
     {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
         $user = User::with('profile')->find($id);
         return view('pages.guru-update', [
             'title' => 'Profil Guru',
             'guru' => $user,
+            'kelas_list' => $kelas_list
         ]);
     }
 
