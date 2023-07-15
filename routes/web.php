@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/kelas', KelasController::class);
     Route::post('/kelas/join', [KelasController::class, 'join'])->name('kelas.join');
     Route::get('/kelas/{id}/{kode}', [KelasController::class, 'kelas_detail'])->name('kelas.detail');
+    Route::post('/kelas/{id}/{kode}/post/store', [KelasController::class, 'kelas_post'])->name('kelas.post');
+    Route::post('/kelas/{id}/{kode}/{post_id}/store', [KelasController::class, 'kelas_comment'])->name('kelas.post.comment');
+    Route::get('/kelas/post/{comment_id}/delete', [KelasController::class, 'kelas_comment_hapus'])->name('kelas.post.comment.hapus');
     Route::get('/materi', [PageController::class, 'materi'])->name('materi');
     Route::get('/tugas', [PageController::class, 'tugas'])->name('tugas');
     Route::get('/kuis', [PageController::class, 'kuis'])->name('kuis');

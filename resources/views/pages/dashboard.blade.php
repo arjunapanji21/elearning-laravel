@@ -1,10 +1,16 @@
 @extends('layouts.main') @section('content')
 <div class="font-bold text-xl pb-4">Dashboard</div>
-@for($i=0;$i<5;$i++)
+@foreach($posts as $post)
 <div class="flex gap-4">
     <div class="divider divider-horizontal">
-        <span class="font-bold -my-1 text-xs">{{ date("d/m/y") }}</span>
-        <span class="-my-1 text-xs">{{ date("H:i") }}</span>
+        <span
+            class="font-bold -my-1 text-xs"
+            >{{ date("d/m/y", strtotime($post->created_at)) }}</span
+        >
+        <span
+            class="-my-1 text-xs"
+            >{{ date("H:i", strtotime($post->created_at)) }}</span
+        >
     </div>
     <div class="card border card-compact w-full my-2 hover:shadow">
         <div class="card-body">
@@ -13,10 +19,13 @@
                     <div
                         class="bg-neutral-focus text-neutral-content rounded-full w-8"
                     >
-                        <span class="text-sm font-semiboldcapitalize">S</span>
+                        <span
+                            class="text-sm font-semiboldcapitalize"
+                            >{{$post->profile->user->name[0]}}</span
+                        >
                     </div>
                 </div>
-                <div class="font-bold">Siti Nurbaya</div>
+                <div class="font-bold">{{$post->profile->user->name}}</div>
                 <div class="text-primary">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -31,20 +40,36 @@
                         />
                     </svg>
                 </div>
-                <div class="">Bahasa Indonesia TBS12</div>
+                <div class="">{{$post->kelas->nama}}</div>
             </div>
             <div class="p-4 border-t">
-                <div class="card-title">Tugas 1</div>
                 <div class="">
-                    Carilah artikel berita terkini mengenai isu lingkungan dan
-                    buatlah rangkuman serta pendapatmu. Upload tugas di kolom
-                    komentar, ditunggu paling lambat hari senin!
+                    {{$post->text}}
+                </div>
+                <div class="divider"></div>
+                <a
+                    href="/data/post/files/{{$post->files}}"
+                    class="font-bold bg-base-200 p-1"
+                    download
+                >
+                    {{$post->files}}
+                </a>
+                <div>
+                    <img
+                        src="/data/post/images/{{$post->images}}"
+                        alt="post-image"
+                        class="my-2"
+                    />
                 </div>
             </div>
             <div class="card-actions">
-                <div class="btn btn-block normal-case">Lihat</div>
+                <a
+                    href="{{route('kelas.detail', [$post->kelas->id, $post->kelas->kode])}}"
+                    class="btn btn-block normal-case"
+                    >Lihat</a
+                >
             </div>
         </div>
     </div>
 </div>
-@endfor @endsection
+@endforeach @endsection

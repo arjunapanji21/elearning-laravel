@@ -37,5 +37,25 @@ class DatabaseSeeder extends Seeder
             'user_id' => $id,
             'role' => 'Admin',
         ]);
+        $id = User::create([
+            'name' => 'Siti Nurbaya',
+            'email' => 'siti@gmail.com',
+            'username' => 'siti',
+            'password' => bcrypt('siti'),
+        ])->id;
+        Profile::create([
+            'user_id' => $id,
+            'role' => 'Guru',
+        ]);
+        $id = User::create([
+            'name' => 'Adit',
+            'email' => 'adit@gmail.com',
+            'username' => 'adit',
+            'password' => bcrypt('adit'),
+        ])->id;
+        Profile::create([
+            'user_id' => $id,
+            'role' => 'Siswa',
+        ]);
     }
 }

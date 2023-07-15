@@ -4,10 +4,49 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\Post;
+use App\Models\PostComment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class KelasController extends Controller
 {
+    public function kelas_post(Request $request, $kelas_id, $kelas_kode)
+    {
+        $data = $request->all();
+        $data['profile_id'] = auth()->user()->profile->id;
+        $data['kelas_id'] = $kelas_id;
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+            $filename = date('YmdHi') . $files[0]->getClientOriginalName();
+            $files[0]->move(public_path('data/post/files'), $filename);
+            $data['files'] = $filename;
+        }
+        if ($request->hasFile('images')) {
+            $images = $request->file('images');
+            $filename = date('YmdHi') . $images[0]->getClientOriginalName();
+            $images[0]->move(public_path('data/post/images'), $filename);
+            $data['images'] = $filename;
+        }
+        Post::create($data);
+        return back()->with('success', 'Berhasil membuat postingan baru.');
+    }
+
+    public function kelas_comment(Request $request, $kelas_id, $kelas_kode, $post_id)
+    {
+        $data = $request->all();
+        $data['profile_id'] = auth()->user()->profile->id;
+        $data['post_id'] = $post_id;
+        PostComment::create($data);
+        return back()->with('success', 'Berhasil mengirim komentar.');
+    }
+
+    public function kelas_comment_hapus($comment_id)
+    {
+        PostComment::find($comment_id)->delete();
+        return back()->with('success', 'Berhasil menghapus komentar.');
+    }
+
     public function kelas_detail($id, $kode)
     {
         if (auth()->user()->profile->role == "Siswa") {
@@ -20,7 +59,8 @@ class KelasController extends Controller
         return view('pages.kelas-detail', [
             'title' => 'Kelas',
             'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
-            'kelas_list' => $kelas_list
+            'kelas_list' => $kelas_list,
+            'posts' => Post::with(['comments', 'profile'])->where('kelas_id', $id)->orderBy('created_at', 'desc')->get(),
         ]);
     }
     public function join(Request $request)

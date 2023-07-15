@@ -110,7 +110,7 @@
                         class="w-1/5 min-h-screen bg-base-200 hidden lg:flex lg:flex-col"
                     >
                         <div class="p-4">
-                            <div class="flex gap-3 items-center">
+                            <div class="flex gap-3 items-center sticky">
                                 <div class="avatar online placeholder">
                                     <div
                                         class="bg-neutral-focus text-neutral-content rounded-full w-12"
@@ -308,7 +308,7 @@
                         </div>
                     </div>
                     <div
-                        class="w-full lg:w-3/5 min-h-screen bg-base-100 overflow-y-auto"
+                        class="w-full lg:w-3/5 max-h-screen bg-base-100 overflow-y-auto"
                     >
                         <div class="p-4">
                             <!-- Page content here -->
