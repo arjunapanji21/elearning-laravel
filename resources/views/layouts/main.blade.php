@@ -95,7 +95,12 @@
                                 tabindex="0"
                                 class="dropdown-content z-[1] menu p-2 shadow bg-primary rounded-box w-52"
                             >
-                                <li><a>Profile</a></li>
+                                <li>
+                                    <a
+                                        href="{{route('profile', [auth()->user()->profile->id, auth()->user()->name])}}"
+                                        >Profile</a
+                                    >
+                                </li>
                                 <li>
                                     <a href="{{ route('user.logout') }}"
                                         >Keluar</a
@@ -243,26 +248,6 @@
                                             >
                                         </li>
                                         <li>
-                                            <a href="{{ route('materi') }}">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="16"
-                                                    height="16"
-                                                    fill="currentColor"
-                                                    class="bi bi-bookmarks-fill"
-                                                    viewBox="0 0 16 16"
-                                                >
-                                                    <path
-                                                        d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z"
-                                                    />
-                                                    <path
-                                                        d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"
-                                                    />
-                                                </svg>
-                                                Materi</a
-                                            >
-                                        </li>
-                                        <li>
                                             <a href="{{ route('tugas') }}">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -326,13 +311,19 @@
                                         @if(auth()->user()->profile->role ==
                                         "Siswa") @foreach($kelas_list as $row)
                                         <li>
-                                            <a>{{$row->kelas->nama}}</a>
+                                            <a
+                                                href="{{ route('kelas.detail', [$row->kelas->id, $row->kelas->kode]) }}"
+                                                >{{$row->kelas->nama}}</a
+                                            >
                                         </li>
                                         @endforeach
                                         @elseif(auth()->user()->profile->role !=
                                         "Siswa") @foreach($kelas_list as $row)
                                         <li>
-                                            <a>{{$row->nama}}</a>
+                                            <a
+                                                href="{{ route('kelas.detail', [$row->id, $row->kode]) }}"
+                                                >{{$row->nama}}</a
+                                            >
                                         </li>
                                         @endforeach @endif
                                     </ul>
@@ -437,26 +428,6 @@
                                 />
                             </svg>
                             Kelas</a
-                        >
-                    </li>
-                    <li class="border-b border-b-primary-focus">
-                        <a href="{{ route('materi') }}">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="16"
-                                height="16"
-                                fill="currentColor"
-                                class="bi bi-bookmarks-fill"
-                                viewBox="0 0 16 16"
-                            >
-                                <path
-                                    d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z"
-                                />
-                                <path
-                                    d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"
-                                />
-                            </svg>
-                            Materi</a
                         >
                     </li>
                     <li class="border-b border-b-primary-focus">

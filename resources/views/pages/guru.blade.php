@@ -1,7 +1,7 @@
 @extends('layouts.main') @section('content')
-@if(session('success'))
+@if(session('alert'))
 <script>
-    alert("{{ session('success') }}");
+    alert("{{ session('alert') }}");
 </script>
 @endif
 <div class="card card-compact w-full">

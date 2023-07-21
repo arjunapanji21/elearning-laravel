@@ -42,22 +42,63 @@ class PageController extends Controller
             'posts' => $posts,
         ]);
     }
-    public function materi()
+    public function profile($profile_id, $nama)
     {
-        $user = User::with('profile')->find(auth()->user()->id);
-        return view('pages.materi', [
-            'title' => 'Materi',
-            'user' => $user,
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->orderBy('created_at', 'desc')->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->orderBy('created_at', 'desc')->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.profile', [
+            'title' => 'Profile',
+            'kelas_list' => $kelas_list,
+            'profile' => Profile::find($profile_id),
         ]);
     }
-    public function tugas()
+
+    public function profile_update($profile_id, Request $request)
     {
-        $user = User::with('profile')->find(auth()->user()->id);
-        return view('pages.tugas', [
-            'title' => 'Tugas',
-            'user' => $user,
-        ]);
+        $data = $request->all();
+        try {
+            if ($data['password'] != '') {
+                if ($data['password'] == $data['password_confirmation']) {
+                    $data['password'] = bcrypt($data['password']);
+                }
+                User::find(auth()->user()->id)->update([
+                    'name' => $data['nama'],
+                    'email' => $data['email'],
+                    'username' => $data['username'],
+                    'password' => $data['password'],
+                ]);
+            } else {
+                User::find(auth()->user()->id)->update([
+                    'name' => $data['nama'],
+                    'email' => $data['email'],
+                    'username' => $data['username'],
+                ]);
+            }
+            if ($request->hasFile('foto')) {
+                $file = $request->file('foto');
+                $filename = date('YmdHi') . $file->getClientOriginalName();
+                $file->move(public_path('data/profile'), $filename);
+                $data['foto'] = $filename;
+            } else {
+                $data['foto'] = auth()->user()->profile->foto;
+            }
+            Profile::find(auth()->user()->profile->id)->update([
+                'tgl_lahir' => $data['tgl_lahir'],
+                'alamat' => $data['alamat'],
+                'telp' => $data['telp'],
+                'foto' => $data['foto'],
+            ]);
+            return back()->with('alert', 'Berhasil mengupdate profile.');
+        } catch (\Throwable $th) {
+            return back()->with('alert', 'Gagal mengupdate profile.');
+        }
     }
+
     public function kuis()
     {
         $user = User::with('profile')->find(auth()->user()->id);

@@ -19,4 +19,8 @@ class Profile extends Model
     {
         return $this->hasMany(Kelas::class);
     }
+    public function materi()
+    {
+        return $this->hasMany(Materi::class);
+    }
 }

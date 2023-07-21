@@ -135,7 +135,7 @@ class GuruController extends Controller
                 $data['password'] = $user->password;
             }
             $user->update($data);
-            return redirect(route('guru.index'))->with('success', 'Data Guru Berhasil di Update!');
+            return redirect(route('guru.index'))->with('alert', 'Data Guru Berhasil di Update!');
         } catch (\Throwable $th) {
             return back()->withErrors(['error' => 'Gagal melakukan perubahan data! Periksa nama dan email.']);
         }

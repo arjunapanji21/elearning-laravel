@@ -1,4 +1,9 @@
 @extends('layouts.main') @section('content')
+@if(session('alert'))
+<script>
+    alert("{{ session('alert') }}");
+</script>
+@endif
 <div class="card card-compact w-full">
     <div class="card-body">
         <div class="card-title">
@@ -8,13 +13,28 @@
                 >{{$kelas->kode}}</span
             >
         </div>
-        <div class="flex">
-            <div class="p-4 btn rounded-none normal-case font-bold">Materi</div>
-            <div class="p-4 btn rounded-none normal-case font-bold">Tugas</div>
-            <div class="p-4 btn rounded-none normal-case font-bold">Kuis</div>
-            <div class="p-4 btn rounded-none normal-case font-bold">
+        <div class="grid grid-cols-4">
+            <a
+                href="{{ route('kelas.materi.detail', [$kelas->id, $kelas->kode]) }}"
+                class="p-4 btn rounded-none normal-case font-bold"
+                >Materi</a
+            >
+            <a
+                href="{{ route('kelas.tugas.detail', [$kelas->id, $kelas->kode]) }}"
+                class="p-4 btn rounded-none normal-case font-bold"
+                >Tugas</a
+            >
+            <a
+                href="{{ route('kelas.kuis.detail', [$kelas->id, $kelas->kode]) }}"
+                class="p-4 btn rounded-none normal-case font-bold"
+                >Kuis</a
+            >
+            <a
+                href="{{ route('kelas.anggota', [$kelas->id, $kelas->kode]) }}"
+                class="p-4 btn rounded-none normal-case font-bold"
+            >
                 Anggota
-            </div>
+            </a>
         </div>
         @if(auth()->user()->profile->role == "Guru")
         <form
@@ -23,13 +43,6 @@
             enctype="multipart/form-data"
         >
             @csrf
-            <input
-                type="number"
-                name="kelas_id"
-                value="{{$kelas->id}}"
-                readonly
-                hidden
-            />
             <textarea
                 name="text"
                 class="textarea textarea-primary w-full"
@@ -134,19 +147,9 @@
     </div>
 </div>
 @foreach($posts as $post)
-<div class="flex gap-4">
-    <div class="divider divider-horizontal">
-        <span
-            class="font-bold -my-1 text-xs"
-            >{{ date("d/m/y", strtotime($post->created_at)) }}</span
-        >
-        <span
-            class="-my-1 text-xs"
-            >{{ date("H:i", strtotime($post->created_at)) }}</span
-        >
-    </div>
-    <div class="card border card-compact w-full my-2 hover:shadow">
-        <div class="card-body">
+<div class="card border my-4 card-compact w-full shadow">
+    <div class="card-body">
+        <div class="flex items-center justify-between">
             <div class="flex gap-2 items-center justify-start">
                 <div class="avatar placeholder">
                     <div
@@ -159,43 +162,49 @@
                     </div>
                 </div>
                 <div class="font-bold">{{$post->profile->user->name}}</div>
-                <!-- <div class="text-primary">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-caret-right-fill"
-                        viewBox="0 0 16 16"
-                    >
-                        <path
-                            d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
-                        />
-                    </svg>
-                </div>
-                <div class="">Bahasa Indonesia TBS12</div> -->
             </div>
-            <div class="p-4 border-t">
-                <div class="">
-                    {{$post->text}}
-                </div>
-                <div class="divider"></div>
-                <a
-                    href="/data/post/files/{{$post->files}}"
-                    class="font-bold bg-base-200 p-1"
-                    download
+            <!-- <div class="text-primary">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-caret-right-fill"
+                    viewBox="0 0 16 16"
                 >
-                    {{$post->files}}
-                </a>
-                <div>
-                    <img
-                        src="/data/post/images/{{$post->images}}"
-                        alt="post-image"
-                        class="my-2"
+                    <path
+                        d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
                     />
-                </div>
+                </svg>
             </div>
-            <div class="bg-base-200 rounded-lg mx-4 p-4">
+            <div class="">Bahasa Indonesia TBS12</div> -->
+            <div class="opacity-50">
+                {{ date("D, d M Y H:i:s", strtotime($post->created_at)) }} | <a onclick="return confirm('Hapus postingan ini?')" href="{{route('kelas.post.hapus', $post->id)}}">Hapus</a>
+            </div>
+        </div>
+        <div class="p-4 border-t">
+            <div class="">{!! $post->text !!}</div>
+            <div class="divider"></div>
+            @if($post->files != '')
+            <a
+                href="/data/post/files/{{$post->files}}"
+                class="font-bold bg-base-200 p-1"
+                download
+            >
+                {{$post->files}}
+            </a>
+            @endif @if($post->images != '')
+            <div>
+                <img
+                    src="/data/post/images/{{$post->images}}"
+                    alt="post-image"
+                    class="my-2"
+                />
+            </div>
+            @endif
+        </div>
+        <div class="bg-base-200 rounded-lg mx-4 -mt-4 p-4">
+            <div class="w-full max-h-60 overflow-y-auto">
                 @foreach($post->comments as $comment)
                 @if($comment->profile->user->id == auth()->user()->id)
                 <div class="chat chat-end">
@@ -207,7 +216,7 @@
                         >
                     </div>
                     <div class="chat-bubble">{{$comment->text}}</div>
-                    <a
+                    <a onclick="return confirm('Hapus komentar ini?')"
                         href="{{ route('kelas.post.comment.hapus', [$comment->id]) }}"
                         class="chat-footer opacity-50"
                         >Hapus</a
@@ -230,25 +239,37 @@
                     > -->
                 </div>
                 @endif @endforeach
-                <form
-                    action="{{ route('kelas.post.comment', [$kelas->id, $kelas->kode, $post->id]) }}"
-                    method="post"
-                >
-                    @csrf
-                    <div>{{auth()->user()->name}}</div>
-                    <textarea
-                        name="text"
-                        class="textarea textarea-bordered w-full"
-                        placeholder="Ketikkan sesuatu..."
-                    ></textarea>
-                    <button
-                        type="submit"
-                        class="btn btn-primary btn-block text-base-100"
-                    >
-                        Kirim
-                    </button>
-                </form>
             </div>
+            <form
+                action="{{ route('kelas.post.comment', [$kelas->id, $kelas->kode, $post->id]) }}"
+                method="post"
+            >
+                @csrf
+                <div>{{auth()->user()->name}}</div>
+                <textarea
+                    name="text"
+                    class="textarea textarea-bordered w-full"
+                    placeholder="Ketikkan sesuatu..."
+                ></textarea>
+                <button
+                    type="submit"
+                    class="btn btn-primary btn-block text-base-100"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-send-fill"
+                        viewBox="0 0 16 16"
+                    >
+                        <path
+                            d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"
+                        />
+                    </svg>
+                    Kirim
+                </button>
+            </form>
         </div>
     </div>
 </div>

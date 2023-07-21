@@ -12,7 +12,7 @@
             >{{ date("H:i", strtotime($post->created_at)) }}</span
         >
     </div>
-    <div class="card border card-compact w-full my-2 hover:shadow">
+    <div class="card border card-compact w-full my-2 shadow">
         <div class="card-body">
             <div class="flex gap-2 items-center justify-start">
                 <div class="avatar placeholder">
@@ -43,10 +43,9 @@
                 <div class="">{{$post->kelas->nama}}</div>
             </div>
             <div class="p-4 border-t">
-                <div class="">
-                    {{$post->text}}
-                </div>
+                <div class="">{!!$post->text!!}</div>
                 <div class="divider"></div>
+                @if($post->files != '')
                 <a
                     href="/data/post/files/{{$post->files}}"
                     class="font-bold bg-base-200 p-1"
@@ -54,6 +53,7 @@
                 >
                     {{$post->files}}
                 </a>
+                @endif @if($post->images != '')
                 <div>
                     <img
                         src="/data/post/images/{{$post->images}}"
@@ -61,6 +61,7 @@
                         class="my-2"
                     />
                 </div>
+                @endif
             </div>
             <div class="card-actions">
                 <a

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\Materi;
 use App\Models\Post;
 use App\Models\PostComment;
 use Illuminate\Http\Request;
@@ -32,6 +33,12 @@ class KelasController extends Controller
         return back()->with('success', 'Berhasil membuat postingan baru.');
     }
 
+    public function kelas_post_hapus($post_id)
+    {
+        Post::find($post_id)->delete();
+        return back()->with('alert', 'Berhasil menghapus postingan.');
+    }
+
     public function kelas_comment(Request $request, $kelas_id, $kelas_kode, $post_id)
     {
         $data = $request->all();
@@ -45,6 +52,68 @@ class KelasController extends Controller
     {
         PostComment::find($comment_id)->delete();
         return back()->with('success', 'Berhasil menghapus komentar.');
+    }
+
+    public function kelas_materi($id, $kode)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.materi-detail', [
+            'title' => 'Materi',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+            'materi' => Materi::with(['profile', 'kelas'])->where('kelas_id', $id)->get(),
+        ]);
+    }
+
+    public function kelas_materi_upload($id, $kode, Request $request)
+    {
+        $data = $request->all();
+        if ($request->hasFile('dokumen')) {
+            $file = $request->file('dokumen');
+        }
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+        }
+        $originalName = explode('.', $file->getClientOriginalName());
+        $fileFormat = $originalName[count($originalName) - 1];
+        $data['file'] = $data['judul'] . date(' [His].') . $fileFormat;
+        $data['profile_id'] = auth()->user()->profile->id;
+        $data['kelas_id'] = $id;
+        $file->move(public_path('data/materi'), $data['file']);
+        try {
+            Materi::create($data);
+            Post::create([
+                'text' => 'Menambahkan materi <a class="font-bold text-primary hover:text-primary-focus" href="' . str_replace('upload', '', $_SERVER['REQUEST_URI']) . '">' . $data['judul'] . '</a>',
+                'kelas_id' => $id,
+                'profile_id' => $data['profile_id'],
+            ]);
+            return back()->with('alert', 'Berhasil mengupload materi.');
+        } catch (\Throwable $th) {
+            return back()->with('alert', 'Gagal mengupload materi.');
+        }
+    }
+
+    public function kelas_materi_delete($id, $kode, $materi_id)
+    {
+        $materi = Materi::find($materi_id);
+        $post = Post::where('text', 'like', '%' . $materi->judul . '%')->first();
+        try {
+            $post->delete();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        try {
+            $materi->delete();
+            return back()->with('alert', 'Berhasil menghapus materi.');
+        } catch (\Throwable $th) {
+            return back()->with('alert', 'Gagal menghapus materi.');
+        }
     }
 
     public function kelas_detail($id, $kode)
@@ -76,6 +145,22 @@ class KelasController extends Controller
             ]);
             return back()->with('success', 'Berhasil Join Kelas');
         }
+    }
+
+    public function kelas_anggota($id, $kode)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.kelas-anggota', [
+            'title' => 'Anggota',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+        ]);
     }
     /**
      * Display a listing of the resource.

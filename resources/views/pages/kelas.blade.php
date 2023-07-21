@@ -15,38 +15,46 @@
                     >Tambah</a
                 >
                 @elseif(auth()->user()->profile->role == 'Siswa')
-                <button
+                <label
                     class="btn btn-sm btn-primary text-base-100"
-                    onclick="modal_join_kelas.showModal()"
+                    for="modal-join-kelas"
                 >
                     Join Kelas
-                </button>
-                <dialog id="modal_join_kelas" class="modal">
-                    <form
-                        action="{{ route('kelas.join') }}"
-                        method="post"
-                        class="modal-box"
-                    >
-                        @csrf
-                        <h3 class="font-bold text-lg mb-2">Input Kode Kelas</h3>
-                        <input
-                            name="kode"
-                            type="text"
-                            placeholder="Kode Kelas"
-                            class="input input-bordered w-full"
-                        />
-                        <div class="modal-action">
-                            <!-- if there is a button in form, it will close the modal -->
-                            <button
-                                type="submit"
-                                class="btn btn-primary text-base-100"
-                            >
-                                Join
-                            </button>
-                            <label class="btn">Batal</label>
-                        </div>
-                    </form>
-                </dialog>
+                </label>
+                <input
+                    type="checkbox"
+                    id="modal-join-kelas"
+                    class="modal-toggle"
+                />
+                <div class="modal">
+                    <div class="modal-box">
+                        <form action="{{ route('kelas.join') }}" method="post">
+                            @csrf
+                            <h3 class="font-bold text-lg mb-2">
+                                Input Kode Kelas
+                            </h3>
+                            <input
+                                name="kode"
+                                type="text"
+                                placeholder="Kode Kelas"
+                                class="input input-bordered w-full"
+                            />
+                            <div class="modal-action">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary text-base-100"
+                                >
+                                    Join
+                                </button>
+                                <label
+                                    for="modal-join-kelas"
+                                    class="btn btn-ghost"
+                                    >Batal</label
+                                >
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 @endif
             </div>
             <div class="ml-auto join">
@@ -110,6 +118,13 @@
                         class="btn btn-ghost btn-xs"
                         >Lihat</a
                     >
+                    @if(auth()->user()->profile->role != 'Siswa')
+                    <a
+                        href="{{ route('kelas.detail', [$row->id, $row->kode]) }}"
+                        class="btn btn-ghost text-error btn-xs"
+                        >Hapus</a
+                    >
+                    @endif
                 </td>
             </tr>
             @elseif(auth()->user()->profile->role == 'Siswa')
