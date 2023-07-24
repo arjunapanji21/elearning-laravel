@@ -156,4 +156,12 @@ class AdminController extends Controller
     {
         //
     }
+
+    public function admin_hapus($user_id)
+    {
+        $user = User::find($user_id);
+        Profile::find($user->profile->id)->delete();
+        $user->delete();
+        return back()->with('alert', 'Berhasil menghapus data admin.');
+    }
 }

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Kelas;
 use App\Models\KelasSiswa;
+use App\Models\Materi;
+use App\Models\Post;
+use App\Models\PostComment;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -150,5 +153,28 @@ class GuruController extends Controller
     public function destroy(User $user)
     {
         //
+    }
+
+    public function guru_hapus($user_id)
+    {
+        $user = User::find($user_id);
+        foreach (Post::where('profile_id', $user->profile->id)->get() as $row) {
+            foreach (PostComment::where('post_id', $row->id)->get() as $row2) {
+                $row2->delete();
+            }
+            $row->delete();
+        }
+        foreach (Materi::where('profile_id', $user->profile->id)->get() as $row) {
+            $row->delete();
+        }
+        foreach (Kelas::where('profile_id', $user->profile->id)->get() as $row) {
+            foreach (KelasSiswa::where('kelas_id', $row->id)->get() as $row2) {
+                $row2->delete();
+            }
+            $row->delete();
+        }
+        Profile::find($user->profile->id)->delete();
+        $user->delete();
+        return back()->with('alert', 'Berhasil menghapus data guru.');
     }
 }

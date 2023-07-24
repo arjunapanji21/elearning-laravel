@@ -32,14 +32,14 @@
             </a>
 
             <a
-                href="{{ route('kelas.tugas.detail', [$kelas->id, $kelas->kode]) }}"
+                href="{{ route('kelas.tugas', [$kelas->id, $kelas->kode]) }}"
                 class="p-4 btn rounded-none normal-case font-bold"
                 >Tugas</a
             >
             <a
-                href="{{ route('kelas.kuis.detail', [$kelas->id, $kelas->kode]) }}"
+                href="{{ route('kelas.ujian', [$kelas->id, $kelas->kode]) }}"
                 class="p-4 btn rounded-none normal-case font-bold"
-                >Kuis</a
+                >Ujian</a
             >
             <a
                 href="{{ route('kelas.anggota', [$kelas->id, $kelas->kode]) }}"
@@ -147,7 +147,7 @@
                                     />
                                 </svg>
                             </a>
-                            @if(auth()->user()->profile->role != 'Siswa')
+                            @if(auth()->user()->profile->role == 'Guru')
                             <a
                                 onclick="return confirm('Hapus materi ini?')"
                                 href="{{route('kelas.materi.delete', [$kelas->id, $kelas->kode, $row->id])}}"

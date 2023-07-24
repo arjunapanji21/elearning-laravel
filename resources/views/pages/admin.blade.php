@@ -1,6 +1,6 @@
-@extends('layouts.main') @section('content') @if(session('success'))
+@extends('layouts.main') @section('content') @if(session('alert'))
 <script>
-    alert("{{ session('success') }}");
+    alert("{{ session('alert') }}");
 </script>
 @endif
 <div class="card card-compact w-full">
@@ -8,11 +8,14 @@
         <div class="card-title justify-between items-center">
             <div>
                 <span>Admin</span>
+                @if(auth()->user()->profile->role == "Admin" or
+                auth()->user()->profile->role == "Super Admin")
                 <a
                     href="{{ route('admin.create') }}"
                     class="btn btn-primary btn-sm normal-case text-base-100"
                     >Tambah</a
                 >
+                @endif
             </div>
             <div class="ml-auto join">
                 <div>
@@ -74,11 +77,20 @@
                     {{date('d/m/Y', strtotime($admin->created_at))}}
                 </td>
                 <th>
+                    @if(auth()->user()->profile->role == "Admin" or
+                    auth()->user()->profile->role == "Super Admin")
                     <a
                         href="{{ route('admin.edit', $admin->user_id) }}"
                         class="btn btn-ghost btn-xs"
                         >details</a
                     >
+                    <a
+                        onclick="return confirm('Hapus admin ini?')"
+                        href="{{ route('admin.hapus', $admin->user_id) }}"
+                        class="btn btn-ghost text-error btn-xs"
+                        >Hapus</a
+                    >
+                    @endif
                 </th>
             </tr>
             @endforeach

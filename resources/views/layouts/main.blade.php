@@ -247,7 +247,7 @@
                                                 Kelas</a
                                             >
                                         </li>
-                                        <li>
+                                        <!-- <li>
                                             <a href="{{ route('tugas') }}">
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
@@ -284,9 +284,9 @@
                                                         d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"
                                                     />
                                                 </svg>
-                                                Kuis</a
+                                                Ujian</a
                                             >
-                                        </li>
+                                        </li> -->
                                     </ul>
                                 </li>
                             </ul>
@@ -359,6 +359,8 @@
                             Dashboard</a
                         >
                     </li>
+                    @if(auth()->user()->profile->role == 'Admin' or
+                    auth()->user()->profile->role == 'Super Admin')
                     <li class="border-b border-b-primary-focus">
                         <a href="{{ route('admin.index') }}">
                             <svg
@@ -410,6 +412,7 @@
                             Siswa</a
                         >
                     </li>
+                    @endif
                     <li class="border-b border-b-primary-focus">
                         <a href="{{ route('kelas.index') }}">
                             <svg
@@ -430,7 +433,7 @@
                             Kelas</a
                         >
                     </li>
-                    <li class="border-b border-b-primary-focus">
+                    <!-- <li class="border-b border-b-primary-focus">
                         <a href="{{ route('tugas') }}">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -467,9 +470,9 @@
                                     d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"
                                 />
                             </svg>
-                            Kuis</a
+                            Ujian</a
                         >
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>

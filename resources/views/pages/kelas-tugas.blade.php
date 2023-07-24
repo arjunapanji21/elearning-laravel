@@ -1,5 +1,4 @@
-@extends('layouts.main') @section('content')
-@if(session('alert'))
+@extends('layouts.main') @section('content') @if(session('alert'))
 <script>
     alert("{{ session('alert') }}");
 </script>
@@ -15,14 +14,26 @@
         </div>
         <div class="grid grid-cols-4">
             <a
+                href="{{ route('kelas.detail', [$kelas->id, $kelas->kode]) }}"
+                class="p-4 btn rounded-none normal-case font-bold"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="currentColor"
+                    class="bi bi-house-door-fill"
+                    viewBox="0 0 16 16"
+                >
+                    <path
+                        d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5Z"
+                    />
+                </svg>
+            </a>
+            <a
                 href="{{ route('kelas.materi.detail', [$kelas->id, $kelas->kode]) }}"
                 class="p-4 btn rounded-none normal-case font-bold"
                 >Materi</a
-            >
-            <a
-                href="{{ route('kelas.tugas', [$kelas->id, $kelas->kode]) }}"
-                class="p-4 btn rounded-none normal-case font-bold"
-                >Tugas</a
             >
             <a
                 href="{{ route('kelas.ujian', [$kelas->id, $kelas->kode]) }}"
@@ -38,16 +49,23 @@
         </div>
         @if(auth()->user()->profile->role == "Guru")
         <form
-            action="{{ route('kelas.post', [$kelas->id, $kelas->kode]) }}"
+            action="{{ route('kelas.tugas.new', [$kelas->id, $kelas->kode]) }}"
             method="post"
             enctype="multipart/form-data"
         >
             @csrf
+            <div class="form-control w-full py-2">
+                <input name="judul" type="text" placeholder="Judul Tugas" class="input input-bordered w-full" />
+              </div>
             <textarea
-                name="text"
-                class="textarea textarea-primary w-full"
-                placeholder="Apa yang ingin anda bagikan hari ini?"
+                name="deskripsi"
+                class="textarea textarea-bordered w-full py-2"
+                placeholder="Deskripsi Tugas"
             ></textarea>
+            <div class="join w-full">
+                <span class="join-item btn">Deadline</span>
+                <input name="deadline" type="date" placeholder="Deadline Tugas" class="input input-bordered w-full join-item" />
+            </div>
             <div class="flex items-center">
                 <div
                     id="previewFile"
@@ -88,7 +106,7 @@
                     />
                     <label
                         onclick="btnInput('images')"
-                        class="btn btn-primary btn-square btn-outline"
+                        class="btn opacity-50 btn-square btn-outline"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -108,7 +126,7 @@
                     </label>
                     <label
                         onclick="btnInput('files')"
-                        class="btn btn-primary btn-square btn-outline"
+                        class="btn opacity-50 btn-square btn-outline"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -144,136 +162,74 @@
             </div>
         </form>
         @endif
-    </div>
-</div>
-@foreach($posts as $post)
-<div class="card border my-4 card-compact w-full shadow">
-    <div class="card-body">
-        <div class="flex items-center justify-between">
-            <div class="flex gap-2 items-center justify-start">
-                <div class="avatar placeholder">
-                    <div
-                        class="bg-neutral-focus text-neutral-content rounded-full w-8"
-                    >
-                        <span
-                            class="text-sm font-semiboldcapitalize"
-                            >{{$post->profile->user->name[0]}}</span
-                        >
-                    </div>
-                </div>
-                <div class="font-bold">{{$post->profile->user->name}}</div>
-            </div>
-            <!-- <div class="text-primary">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-caret-right-fill"
-                    viewBox="0 0 16 16"
-                >
-                    <path
-                        d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"
-                    />
-                </svg>
-            </div>
-            <div class="">Bahasa Indonesia TBS12</div> -->
-            <div class="opacity-50">
-                {{ date("D, d M Y H:i:s", strtotime($post->created_at)) }} @if(auth()->user()->profile->role == 'Guru')| <a onclick="return confirm('Hapus postingan ini?')" href="{{route('kelas.post.hapus', $post->id)}}">Hapus</a> @endif
-            </div>
-        </div>
-        <div class="p-4 border-t">
-            <div class="">{!! $post->text !!}</div>
-            <div class="divider"></div>
-            @if($post->files != '')
-            <a
-                href="/data/post/files/{{$post->files}}"
-                class="font-bold bg-base-200 p-1"
-                download
-            >
-                {{$post->files}}
-            </a>
-            @endif @if($post->images != '')
-            <div>
-                <img
-                    src="/data/post/images/{{$post->images}}"
-                    alt="post-image"
-                    class="my-2"
-                />
-            </div>
-            @endif
-        </div>
-        <div class="bg-base-200 rounded-lg mx-4 -mt-4 p-4">
-            <div class="w-full max-h-60 overflow-y-auto">
-                @foreach($post->comments as $comment)
-                @if($comment->profile->user->id == auth()->user()->id)
-                <div class="chat chat-end">
-                    <div class="chat-header">
-                        {{$comment->profile->user->name}}
-                        <time
-                            class="text-xs opacity-50"
-                            >{{date('d/m/y H:i', strtotime($comment->created_at))}}</time
-                        >
-                    </div>
-                    <div class="chat-bubble">{{$comment->text}}</div>
-                    <a onclick="return confirm('Hapus komentar ini?')"
-                        href="{{ route('kelas.post.comment.hapus', [$comment->id]) }}"
-                        class="chat-footer opacity-50"
-                        >Hapus</a
-                    >
-                </div>
-                @else
-                <div class="chat chat-start">
-                    <div class="chat-header">
-                        {{$comment->profile->user->name}}
-                        <time
-                            class="text-xs opacity-50"
-                            >{{date('d/m/y H:i', strtotime($comment->created_at))}}</time
-                        >
-                    </div>
-                    <div class="chat-bubble">{{$comment->text}}</div>
-                    <!-- <a
-                        href="{{ route('kelas.post.comment.hapus', [$comment->id]) }}"
-                        class="chat-footer opacity-50"
-                        >Hapus</a
-                    > -->
-                </div>
-                @endif @endforeach
-            </div>
-            <form
-                action="{{ route('kelas.post.comment', [$kelas->id, $kelas->kode, $post->id]) }}"
-                method="post"
-            >
-                @csrf
-                <div>{{auth()->user()->name}}</div>
-                <textarea
-                    name="text"
-                    class="textarea textarea-bordered w-full"
-                    placeholder="Ketikkan sesuatu..."
-                ></textarea>
-                <button
-                    type="submit"
-                    class="btn btn-primary btn-block text-base-100"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="currentColor"
-                        class="bi bi-send-fill"
-                        viewBox="0 0 16 16"
-                    >
-                        <path
-                            d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"
-                        />
-                    </svg>
-                    Kirim
-                </button>
-            </form>
+        <div class="divider"></div>
+        <div class="font-bold text-xl">Tugas</div>
+        <div class="overflow-x-auto">
+            <table class="table">
+                <thead>
+                    <tr class="bg-primary text-primary-content">
+                        <th>No.</th>
+                        <th>Tugas</th>
+                        <th>Deadline</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($tugas as $row)
+                    <tr class="hover">
+                        <th>{{$loop->iteration}}</th>
+                        <td>{{ $row->judul }}</td>
+                        <td>{{ date('d M Y', strtotime($row->deadline)) }}</td>
+                        <td class="text-center">
+                            <a
+                                href="{{route('kelas.tugas.detail', [$kelas->id, $kelas->kode, $row->id])}}"
+                                class="btn btn-sm btn-square btn-primary"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-eye-fill"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"
+                                    />
+                                    <path
+                                        d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"
+                                    />
+                                </svg>
+                            </a>
+                            @if(auth()->user()->profile->role == 'Guru')
+                            <a
+                                onclick="return confirm('Hapus tugas ini?')"
+                                href="{{route('kelas.tugas.delete', [$kelas->id, $kelas->kode, $row->id])}}"
+                                class="btn btn-sm btn-square btn-error"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    fill="currentColor"
+                                    class="bi bi-trash3-fill"
+                                    viewBox="0 0 16 16"
+                                >
+                                    <path
+                                        d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"
+                                    />
+                                </svg>
+                            </a>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-@endforeach @endsection @section('script')
+@endsection @section('script')
 <script>
     function btnInput(type) {
         if (type == "files") {

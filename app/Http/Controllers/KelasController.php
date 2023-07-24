@@ -7,11 +7,150 @@ use App\Models\KelasSiswa;
 use App\Models\Materi;
 use App\Models\Post;
 use App\Models\PostComment;
+use App\Models\Tugas;
+use App\Models\TugasSiswa;
+use App\Models\Ujian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class KelasController extends Controller
 {
+    public function kelas_ujian($id, $kode)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.kelas-ujian', [
+            'title' => 'Ujian',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+            'ujian' => Ujian::with(['profile', 'kelas', 'siswa'])->where('kelas_id', $id)->get(),
+        ]);
+    }
+    public function kelas_tugas($id, $kode)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.kelas-tugas', [
+            'title' => 'Tugas',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+            'tugas' => Tugas::with(['profile', 'kelas', 'siswa'])->where('kelas_id', $id)->get(),
+        ]);
+    }
+
+    public function kelas_tugas_new($id, $kode, Request $request)
+    {
+        $data = $request->all();
+        try {
+            $data['profile_id'] = auth()->user()->profile->id;
+            $data['kelas_id'] = $id;
+            if ($request->hasFile('files')) {
+                $files = $request->file('files');
+                $filename = date('YmdHi') . $files[0]->getClientOriginalName();
+                $files[0]->move(public_path('data/tugas/files'), $filename);
+                $data['files'] = $filename;
+            }
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                $filename = date('YmdHi') . $images[0]->getClientOriginalName();
+                $images[0]->move(public_path('data/tugas/images'), $filename);
+                $data['images'] = $filename;
+            }
+            $tugas_id = Tugas::create($data)->id;
+            foreach (KelasSiswa::where('kelas_id', $id)->get() as $row) {
+                TugasSiswa::create([
+                    'tugas_id' => $tugas_id,
+                    'profile_id' => $row->profile_id,
+                ]);
+            }
+            Post::create([
+                'text' => 'Menambahkan tugas <a class="font-bold text-primary hover:text-primary-focus" href="' . str_replace('new', '', $_SERVER['REQUEST_URI']) . '">' . $data['judul'] . '</a>',
+                'kelas_id' => $id,
+                'profile_id' => $data['profile_id'],
+            ]);
+            return back()->with('alert', 'Berhasil membuat tugas baru.');
+        } catch (\Throwable $th) {
+            return back()->with('alert', 'Gagal membuat tugas baru.');
+        }
+    }
+
+    public function kelas_tugas_detail($id, $kode, $tugas_id)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        if (auth()->user()->profile->role == 'Guru') {
+            return view('pages.kelas-tugas-detail', [
+                'title' => 'Materi',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'tugas' => Tugas::with(['profile', 'kelas', 'siswa'])->where('id', $tugas_id)->get()->first(),
+            ]);
+        } elseif (auth()->user()->profile->role == 'Siswa') {
+            return view('pages.kelas-tugas-detail', [
+                'title' => 'Materi',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'tugas' => Tugas::with(['profile', 'kelas', 'siswa'])->where('id', $tugas_id)->get()->first(),
+                'tugas_siswa' => TugasSiswa::where('tugas_id', $tugas_id)->where('profile_id', auth()->user()->profile->id)->get()->first(),
+            ]);
+        }
+    }
+
+    public function kelas_tugas_submit($id, $kode, $tugas_id, Request $request)
+    {
+        if ($request->hasFile('files')) {
+            $files = $request->file('files');
+            $filename = date('YmdHi') . $files->getClientOriginalName();
+            $files->move(public_path('data/tugas/siswa'), $filename);
+        }
+        $tugas = TugasSiswa::where('tugas_id', $tugas_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+        $tugas->update([
+            'file' => $filename
+        ]);
+        return back()->with('alert', 'Berhasil mengumpulkan tugas.');
+    }
+
+    public function kelas_tugas_submit_nilai($id, $kode, $tugas_id, $tugas_siswa_id, Request $request)
+    {
+        $data = $request->all();
+        $tugas = TugasSiswa::find($tugas_siswa_id);
+        $tugas->update([
+            'nilai' => $data['nilai'],
+        ]);
+        return back()->with('alert', 'Berhasil mengupdate nilai tugas.');
+    }
+
+    public function kelas_tugas_delete($id, $kode, $tugas_id)
+    {
+        $tugas = Tugas::find($tugas_id);
+        $post = Post::where('text', 'like', '%' . $tugas->judul . '%')->first();
+        try {
+            $post->delete();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        $tugas->delete();
+        foreach (TugasSiswa::where('tugas_id', $tugas_id)->get() as $row) {
+            $row->delete();
+        }
+        return back()->with('alert', 'Berhasil menghapus tugas.');
+    }
+
     public function kelas_post(Request $request, $kelas_id, $kelas_kode)
     {
         $data = $request->all();
@@ -30,7 +169,7 @@ class KelasController extends Controller
             $data['images'] = $filename;
         }
         Post::create($data);
-        return back()->with('success', 'Berhasil membuat postingan baru.');
+        return back()->with('alert', 'Berhasil membuat postingan baru.');
     }
 
     public function kelas_post_hapus($post_id)
@@ -45,13 +184,13 @@ class KelasController extends Controller
         $data['profile_id'] = auth()->user()->profile->id;
         $data['post_id'] = $post_id;
         PostComment::create($data);
-        return back()->with('success', 'Berhasil mengirim komentar.');
+        return back()->with('alert', 'Berhasil mengirim komentar.');
     }
 
     public function kelas_comment_hapus($comment_id)
     {
         PostComment::find($comment_id)->delete();
-        return back()->with('success', 'Berhasil menghapus komentar.');
+        return back()->with('alert', 'Berhasil menghapus komentar.');
     }
 
     public function kelas_materi($id, $kode)
@@ -132,6 +271,13 @@ class KelasController extends Controller
             'posts' => Post::with(['comments', 'profile'])->where('kelas_id', $id)->orderBy('created_at', 'desc')->get(),
         ]);
     }
+
+    public function kelas_hapus($id, $kode)
+    {
+        Kelas::find($id)->delete();
+        return back()->with('alert', 'Berhasil menghapus kelas.');
+    }
+
     public function join(Request $request)
     {
         $kelas_id = Kelas::where('kode', $request['kode'])->get()->first()->id;
@@ -143,7 +289,7 @@ class KelasController extends Controller
                 'kelas_id' => $kelas_id,
                 'profile_id' => auth()->user()->profile->id,
             ]);
-            return back()->with('success', 'Berhasil Join Kelas');
+            return back()->with('alert', 'Berhasil Join Kelas');
         }
     }
 
@@ -238,9 +384,9 @@ class KelasController extends Controller
             $data['profile_id'] = auth()->user()->profile->id;
             $data['kode'] = $randomString;
             Kelas::create($data);
-            return redirect(route('kelas.index'));
+            return redirect(route('kelas.index'))->with('alert', 'Berhasil membuat kelas baru.');
         } catch (\Throwable $th) {
-            dd($th);
+            return back()->with('alert', 'Gagal membuat kelas.');
         }
     }
 

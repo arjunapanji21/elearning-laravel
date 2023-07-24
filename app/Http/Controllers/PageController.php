@@ -8,9 +8,14 @@ use App\Models\Post;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Goutte\Client;
 
 class PageController extends Controller
 {
+    public function home()
+    {
+        return view('pages.home');
+    }
     public function dashboard()
     {
         $posts = [];

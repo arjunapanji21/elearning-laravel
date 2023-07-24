@@ -1,6 +1,6 @@
-@extends('layouts.main') @section('content') @if(session('success'))
+@extends('layouts.main') @section('content') @if(session('alert'))
 <script>
-    alert("{{ session('success') }}");
+    alert("{{ session('alert') }}");
 </script>
 @endif
 <div class="card card-compact w-full">
@@ -8,7 +8,7 @@
         <div class="card-title justify-between items-center">
             <div>
                 <span>Kelas</span>
-                @if(auth()->user()->profile->role != 'Siswa')
+                @if(auth()->user()->profile->role == 'Guru')
                 <a
                     href="{{ route('kelas.create') }}"
                     class="btn btn-primary btn-sm normal-case text-base-100"
@@ -78,7 +78,7 @@
                 <th>#</th>
                 <th>Nama Kelas</th>
                 <th>Kode Kelas</th>
-                @if(auth()->user()->profile->role != 'Siswa')
+                @if(auth()->user()->profile->role == 'Guru')
                 <th>Jumlah Siswa</th>
                 @if(auth()->user()->profile->role == 'Super Admin' ||
                 auth()->user()->profile->role == 'Admin')
@@ -118,9 +118,10 @@
                         class="btn btn-ghost btn-xs"
                         >Lihat</a
                     >
-                    @if(auth()->user()->profile->role != 'Siswa')
+                    @if(auth()->user()->profile->role == 'Guru')
                     <a
-                        href="{{ route('kelas.detail', [$row->id, $row->kode]) }}"
+                        onclick="return confirm('Hapus kelas ini?')"
+                        href="{{ route('kelas.hapus', [$row->id, $row->kode]) }}"
                         class="btn btn-ghost text-error btn-xs"
                         >Hapus</a
                     >
