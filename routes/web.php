@@ -65,8 +65,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/kelas/{id}/{kode}/tugas/{tugas_id}/submit', [KelasController::class, 'kelas_tugas_submit'])->name('kelas.tugas.submit');
     Route::post('/kelas/{id}/{kode}/tugas/{tugas_id}/{tugas_siswa_id}/', [KelasController::class, 'kelas_tugas_submit_nilai'])->name('kelas.tugas.submit.nilai');
 
-    // Kuis
+    // Ujian
     Route::get('/kelas/{id}/{kode}/ujian', [KelasController::class, 'kelas_ujian'])->name('kelas.ujian');
+    Route::get('/kelas/{id}/{kode}/ujian/create', [KelasController::class, 'kelas_ujian_create'])->name('kelas.ujian.create');
+    Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}', [KelasController::class, 'kelas_ujian_detail'])->name('kelas.ujian.detail');
+    Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}/start', [KelasController::class, 'kelas_ujian_mulai'])->name('kelas.ujian.mulai');
+    Route::post('/kelas/{id}/{kode}/ujian/{ujian_id}/submit', [KelasController::class, 'kelas_ujian_submit'])->name('kelas.ujian.submit');
+    Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}/delete', [KelasController::class, 'kelas_ujian_delete'])->name('kelas.ujian.delete');
+    Route::post('/kelas/{id}/{kode}/ujian/create/store', [KelasController::class, 'kelas_ujian_store'])->name('kelas.ujian.store');
 
     // Anggota
     Route::get('/kelas/{id}/{kode}/anggota', [KelasController::class, 'kelas_anggota'])->name('kelas.anggota');

@@ -10,6 +10,8 @@ use App\Models\PostComment;
 use App\Models\Tugas;
 use App\Models\TugasSiswa;
 use App\Models\Ujian;
+use App\Models\UjianSiswa;
+use App\Models\UjianSoal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -28,8 +30,166 @@ class KelasController extends Controller
             'title' => 'Ujian',
             'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
             'kelas_list' => $kelas_list,
-            'ujian' => Ujian::with(['profile', 'kelas', 'siswa'])->where('kelas_id', $id)->get(),
+            'ujian' => Ujian::with(['soal', 'siswa'])->where('kelas_id', $id)->get(),
         ]);
+    }
+    public function kelas_ujian_create($id, $kode)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        return view('pages.kelas-ujian-create', [
+            'title' => 'Buat Soal Ujian',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+            'ujian' => Ujian::with(['siswa', 'soal'])->where('kelas_id', $id)->get(),
+        ]);
+    }
+    public function kelas_ujian_detail($id, $kode, $ujian_id)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        if (auth()->user()->profile->role == 'Siswa') {
+            $ujian_siswa = UjianSiswa::where('ujian_id', $ujian_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+            return view('pages.kelas-ujian-detail', [
+                'title' => 'Mulai Ujian',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'ujian' => Ujian::with(['siswa', 'soal'])->find($ujian_id),
+                'ujian_siswa' => $ujian_siswa,
+            ]);
+        } else {
+            return view('pages.kelas-ujian-detail', [
+                'title' => 'Mulai Ujian',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'ujian' => Ujian::with(['siswa', 'soal'])->find($ujian_id),
+            ]);
+        }
+    }
+    public function kelas_ujian_mulai($id, $kode, $ujian_id)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        $ujianSiswa = UjianSiswa::where('ujian_id', $ujian_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+        $ujianSiswa->update([
+            'open' => 1,
+        ]);
+        if (auth()->user()->profile->role == 'Siswa') {
+            $ujian_siswa = UjianSiswa::where('ujian_id', $ujian_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+            return view('pages.kelas-ujian-mulai', [
+                'title' => 'Mulai Ujian',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'ujian' => Ujian::with(['siswa', 'soal'])->find($ujian_id),
+                'ujian_siswa' => $ujian_siswa,
+            ]);
+        } else {
+            return view('pages.kelas-ujian-mulai', [
+                'title' => 'Mulai Ujian',
+                'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+                'kelas_list' => $kelas_list,
+                'ujian' => Ujian::with(['siswa', 'soal'])->find($ujian_id),
+            ]);
+        }
+    }
+
+    public function kelas_ujian_submit($id, $kode, $ujian_id, Request $request)
+    {
+        $data = $request->all();
+        $soal = Ujian::with('soal')->find($ujian_id)->soal;
+        $nilai = 0;
+        foreach ($soal as $key => $row) {
+            if ($data['jawab'][$key] == $row->jawaban) {
+                $nilai += 1;
+            }
+        }
+        $nilai = (int)($nilai * 100 / count($soal));
+        $ujianSiswa = UjianSiswa::where('ujian_id', $ujian_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+        $ujianSiswa->update([
+            'jawaban' => implode('#', $data['jawab']),
+            'nilai' => $nilai,
+        ]);
+        return redirect(route('kelas.ujian', [$id, $kode]))->with('alert', 'Data Ujian Telah Disimpan.');
+    }
+
+    public function kelas_ujian_store($id, $kode, Request $request)
+    {
+        $data = $request->all();
+        try {
+            $ujian_id = Ujian::create([
+                'judul' => $data['judul'],
+                'deskripsi' => $data['deskripsi'],
+                'profile_id' => auth()->user()->profile->id,
+                'kelas_id' => $id,
+                'deadline' => $data['deadline'],
+            ])->id;
+            foreach ($data['soal'] as $key => $row) {
+                // if ($data['jawaban'][$key] == 'A') {
+                //     $jawaban = $data['opsi_a'][$key];
+                // } else if ($data['jawaban'][$key] == 'B') {
+                //     $jawaban = $data['opsi_b'][$key];
+                // } else if ($data['jawaban'][$key] == 'C') {
+                //     $jawaban = $data['opsi_c'][$key];
+                // } else if ($data['jawaban'][$key] == 'D') {
+                //     $jawaban = $data['opsi_d'][$key];
+                // }
+                UjianSoal::create([
+                    'ujian_id' => $ujian_id,
+                    'soal' => $data['soal'][$key],
+                    'opsi_a' => $data['opsi_a'][$key],
+                    'opsi_b' => $data['opsi_b'][$key],
+                    'opsi_c' => $data['opsi_c'][$key],
+                    'opsi_d' => $data['opsi_d'][$key],
+                    'jawaban' => $data['jawaban'][$key],
+                ]);
+            }
+            foreach (KelasSiswa::all() as $row) {
+                UjianSiswa::create([
+                    'ujian_id' => $ujian_id,
+                    'profile_id' => $row->profile_id,
+                ]);
+            }
+            Post::create([
+                'text' => 'Membuat soal ujian <a class="font-bold text-primary hover:text-primary-focus" href="' . str_replace('store', '', $_SERVER['REQUEST_URI']) . '">' . $data['judul'] . '</a>',
+                'kelas_id' => $id,
+                'profile_id' => auth()->user()->profile->id,
+            ]);
+            return redirect(route('kelas.ujian', [$id, $kode]))->with('alert', 'Berhasil membuat ujian baru.');
+        } catch (\Throwable $th) {
+            return back()->with('alert', 'Gagal membuat ujian baru.');
+        }
+    }
+    public function kelas_ujian_delete($id, $kode, $ujian_id)
+    {
+        $ujian = Ujian::find($ujian_id);
+        foreach (UjianSoal::where('ujian_id', $ujian_id) as $row) {
+            $row->delete();
+        }
+        foreach (UjianSiswa::where('ujian_id', $ujian_id) as $row) {
+            $row->delete();
+        }
+        $post = Post::where('text', 'like', '%' . $ujian->judul . '%')->first();
+        try {
+            $post->delete();
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        return back()->with('alert', 'Ujian Berhasil Dihapus.');
     }
     public function kelas_tugas($id, $kode)
     {
