@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/kelas/{id}/{kode}/ujian/create', [KelasController::class, 'kelas_ujian_create'])->name('kelas.ujian.create');
     Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}', [KelasController::class, 'kelas_ujian_detail'])->name('kelas.ujian.detail');
     Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}/start', [KelasController::class, 'kelas_ujian_mulai'])->name('kelas.ujian.mulai');
+    Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}/{ujian_siswa_id}', [KelasController::class, 'kelas_ujian_siswa'])->name('kelas.ujian.siswa');
     Route::post('/kelas/{id}/{kode}/ujian/{ujian_id}/submit', [KelasController::class, 'kelas_ujian_submit'])->name('kelas.ujian.submit');
     Route::get('/kelas/{id}/{kode}/ujian/{ujian_id}/delete', [KelasController::class, 'kelas_ujian_delete'])->name('kelas.ujian.delete');
     Route::post('/kelas/{id}/{kode}/ujian/create/store', [KelasController::class, 'kelas_ujian_store'])->name('kelas.ujian.store');

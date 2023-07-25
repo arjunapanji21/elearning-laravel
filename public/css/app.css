@@ -2142,6 +2142,20 @@ html {
   outline-offset: 2px;
   outline-color: hsl(var(--bc) / 0.2);
 }
+.input-primary {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--p) / var(--tw-border-opacity));
+}
+.input-primary:focus {
+  outline-color: hsl(var(--p) / 1);
+}
+.input-error {
+  --tw-border-opacity: 1;
+  border-color: hsl(var(--er) / var(--tw-border-opacity));
+}
+.input-error:focus {
+  outline-color: hsl(var(--er) / 1);
+}
 .input-disabled,
   .input:disabled,
   .input[disabled] {
@@ -3018,6 +3032,9 @@ html {
 }
 .border {
   border-width: 1px;
+}
+.border-2 {
+  border-width: 2px;
 }
 .border-b {
   border-bottom-width: 1px;

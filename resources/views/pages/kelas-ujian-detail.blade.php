@@ -65,6 +65,7 @@
                                 <th></th>
                                 <th>Nama Siswa</th>
                                 <th class="text-right">Nilai</th>
+                                <th class="text-right"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,64 +74,20 @@
                                 <th>{{$loop->iteration}}</th>
                                 <td>{{$row->profile->user->name}}</td>
                                 <td class="text-right">{{$row->nilai}}/100</td>
-                                {{-- <td class="text-center">
-                                    @if($row->file != '')
+                                <td class="text-center">
+                                    @if($row->open != 0)
                                     <a
-                                        href="{{asset('data/tugas/siswa/'.$row->file)}}"
+                                    href="{{route('kelas.ujian.siswa', [$kelas->id, $kelas->kode, $ujian->id, $row->id])}}"
                                         class="btn btn-success btn-xs"
-                                        target="_blank"
                                         >Lihat</a
                                     >
-                                    <label
-                                        for="modal-nilai"
-                                        class="btn btn-xs btn-info"
-                                        >Nilai</label
-                                    >
-                                    <input
-                                        type="checkbox"
-                                        id="modal-nilai"
-                                        class="modal-toggle"
-                                    />
-                                    <div class="modal">
-                                        <div class="modal-box">
-                                            <h3 class="font-bold text-lg">
-                                                Nilai Tugas
-                                                {{$row->profile->user->name}}
-                                            </h3>
-                                            <form
-                                                action="{{route('kelas.tugas.submit.nilai', [$kelas->id, $kelas->kode, $tugas->id, $row->id])}}"
-                                                method="post"
-                                            >
-                                                @csrf
-                                                <input
-                                                    name="nilai"
-                                                    type="text"
-                                                    placeholder="Nilai Tugas"
-                                                    class="input input-bordered text-center w-full mt-2"
-                                                    value="{{$row->nilai}}"
-                                                />
-                                                <div class="modal-action">
-                                                    <button
-                                                        type="submit"
-                                                        class="btn btn-primary"
-                                                    >
-                                                        Simpan
-                                                    </button>
-                                                    <label
-                                                        for="modal-nilai"
-                                                        class="btn"
-                                                        >Tutup</label
-                                                    >
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
                                     @else
-                                    <span class="badge badge-sm badge-error"
-                                        >Belum Ada</span
+                                    <label
+                                        class="btn btn-disabled btn-xs"
+                                        >Lihat</label
                                     >
                                     @endif
-                                </td> --}}
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -107,6 +107,25 @@ class KelasController extends Controller
             ]);
         }
     }
+    public function kelas_ujian_siswa($id, $kode, $ujian_id, $ujian_siswa_id)
+    {
+        if (auth()->user()->profile->role == "Siswa") {
+            $kelas_list = KelasSiswa::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Guru") {
+            $kelas_list = Kelas::where('profile_id', auth()->user()->profile->id)->get();
+        } else if (auth()->user()->profile->role == "Super Admin" || auth()->user()->profile->role == "Admin") {
+            $kelas_list = Kelas::all();
+        }
+        $ujianSiswa = UjianSiswa::with(['profile'])->find($ujian_siswa_id);
+        $ujianSiswa->jawaban = explode('#', $ujianSiswa->jawaban);
+        return view('pages.kelas-ujian-siswa', [
+            'title' => 'Hasil Ujian Siswa',
+            'kelas' => Kelas::with(['guru', 'siswa'])->where('id', $id)->where('kode', $kode)->get()->first(),
+            'kelas_list' => $kelas_list,
+            'ujian' => Ujian::with(['siswa', 'soal'])->find($ujian_id),
+            'ujian_siswa' => $ujianSiswa,
+        ]);
+    }
 
     public function kelas_ujian_submit($id, $kode, $ujian_id, Request $request)
     {
