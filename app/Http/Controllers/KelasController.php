@@ -184,7 +184,7 @@ class KelasController extends Controller
                 ]);
             }
             Post::create([
-                'text' => 'Membuat soal ujian <a class="font-bold text-primary hover:text-primary-focus" href="' . str_replace('store', '', $_SERVER['REQUEST_URI']) . '">' . $data['judul'] . '</a>',
+                'text' => 'Membuat soal ujian <a class="font-bold text-primary hover:text-primary-focus" href="' . str_replace('create/store', '', $_SERVER['REQUEST_URI']) . '">' . $data['judul'] . '</a>',
                 'kelas_id' => $id,
                 'profile_id' => auth()->user()->profile->id,
             ]);
@@ -296,12 +296,14 @@ class KelasController extends Controller
             $files = $request->file('files');
             $filename = date('YmdHi') . $files->getClientOriginalName();
             $files->move(public_path('data/tugas/siswa'), $filename);
+            $tugas = TugasSiswa::where('tugas_id', $tugas_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
+            $tugas->update([
+                'file' => $filename
+            ]);
+            return back()->with('alert', 'Berhasil mengumpulkan tugas.');
+        } else {
+            return back()->with('alert', 'Gagal mengumpulkan tugas, file tidak valid.');
         }
-        $tugas = TugasSiswa::where('tugas_id', $tugas_id)->where('profile_id', auth()->user()->profile->id)->get()->first();
-        $tugas->update([
-            'file' => $filename
-        ]);
-        return back()->with('alert', 'Berhasil mengumpulkan tugas.');
     }
 
     public function kelas_tugas_submit_nilai($id, $kode, $tugas_id, $tugas_siswa_id, Request $request)

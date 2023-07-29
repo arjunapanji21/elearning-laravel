@@ -9,28 +9,11 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\SiswaController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-// Route::get('/', function () {
-//     return view('index');
-// });
-
-// Route::get('/register', [AuthController::class, 'register'])->name('user.register');
 Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/login', [AuthController::class, 'login'])->name('user.login');
 Route::get('/logout', [AuthController::class, 'logout'])->name('user.logout');
 Route::get('/forgot', [AuthController::class, 'forgot_password'])->name('user.forgot');
 Route::post('/forgot', [AuthController::class, 'reset_password'])->name('user.reset');
-// Route::post('/register', [AuthController::class, 'store'])->name('user.store');
 Route::post('/auth', [AuthController::class, 'auth'])->name('user.auth');
 
 Route::middleware(['auth'])->group(function () {
@@ -77,7 +60,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Anggota
     Route::get('/kelas/{id}/{kode}/anggota', [KelasController::class, 'kelas_anggota'])->name('kelas.anggota');
-
 
     Route::get('/materi', [PageController::class, 'materi'])->name('materi');
     Route::get('/tugas', [PageController::class, 'tugas'])->name('tugas');

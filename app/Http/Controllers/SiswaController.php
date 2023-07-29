@@ -73,9 +73,9 @@ class SiswaController extends Controller
                 'user_id' => $id,
                 'role' => 'Siswa',
             ]);
-            return redirect(route('siswa.index'));
+            return redirect(route('siswa.index'))->with('alert', 'Berhasil membuat akun siswa.');
         } catch (\Throwable $th) {
-            return back()->withErrors('error', $th);
+            return back()->withErrors('alert', $th);
         }
     }
 
@@ -135,9 +135,9 @@ class SiswaController extends Controller
                 $data['password'] = $user->password;
             }
             $user->update($data);
-            return redirect(route('siswa.index'))->with('success', 'Data Siswa Berhasil di Update!');
+            return redirect(route('siswa.index'))->with('alert', 'Data Siswa Berhasil di Update!');
         } catch (\Throwable $th) {
-            return back()->withErrors(['error' => 'Gagal melakukan perubahan data! Periksa nama dan email.']);
+            return back()->with(['alert', 'Gagal melakukan perubahan data! Periksa nama dan email.']);
         }
     }
 
