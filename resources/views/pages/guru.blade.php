@@ -80,6 +80,14 @@
                         class="btn btn-ghost btn-xs"
                         >details</a
                     >
+                    @if(auth()->user()->profile->role == 'Admin' or auth()->user()->profile->role == 'Super Admin')
+                    <a
+                    onclick="return confirm('Hapus data guru ini?')"
+                        href="{{ route('guru.hapus', $guru->user_id) }}"
+                        class="btn btn-ghost text-error btn-xs"
+                        >hapus</a
+                    >
+                    @endif
                 </th>
             </tr>
             @endforeach

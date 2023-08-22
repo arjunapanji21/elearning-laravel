@@ -151,4 +151,12 @@ class SiswaController extends Controller
     {
         //
     }
+
+    public function siswa_hapus($user_id)
+    {
+        $user = User::find($user_id);
+        Profile::find($user->profile->id)->delete();
+        $user->delete();
+        return back()->with('alert', 'Berhasil menghapus data siswa.');
+    }
 }

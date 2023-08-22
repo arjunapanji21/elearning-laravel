@@ -23,7 +23,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('/admin', AdminController::class);
     Route::get('/admin/{user_id}/hapus', [AdminController::class, 'admin_hapus'])->name('admin.hapus');
     Route::resource('/guru', GuruController::class);
+    Route::get('/guru/{id}/delete', [GuruController::class, 'guru_hapus'])->name('guru.hapus');
     Route::resource('/siswa', SiswaController::class);
+    Route::get('/siswa/{id}/delete', [SiswaController::class, 'siswa_hapus'])->name('siswa.hapus');
 
     // Kelas
     Route::resource('/kelas', KelasController::class);

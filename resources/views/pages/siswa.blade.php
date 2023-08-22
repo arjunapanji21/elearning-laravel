@@ -1,7 +1,7 @@
 @extends('layouts.main') @section('content')
-@if(session('success'))
+@if(session('alert'))
 <script>
-    alert("{{ session('success') }}");
+    alert("{{ session('alert') }}");
 </script>
 @endif
 <div class="card card-compact w-full">
@@ -80,6 +80,14 @@
                         class="btn btn-ghost btn-xs"
                         >details</a
                     >
+                    @if(auth()->user()->profile->role == 'Admin' or auth()->user()->profile->role == 'Super Admin')
+                    <a
+                    onclick="return confirm('Hapus data siswa ini?')"
+                        href="{{ route('siswa.hapus', $siswa->user_id) }}"
+                        class="btn btn-ghost text-error btn-xs"
+                        >hapus</a
+                    >
+                    @endif
                 </th>
             </tr>
             @endforeach
